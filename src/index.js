@@ -1,14 +1,3 @@
-// dotenv.config({ path: "./env" });  // Load environment variables from .env file
-
-import connectDB from "./db/index.js";
-import dotenv from "dotenv";
-
-dotenv.config(); // Load environment variables from .env file
-
-connectDB();
-
-// This is the second approach to connect to MongoDB and start the Express server.
-
 // This is the first approach to connect to MongoDB and start the Express server.
 // IIFE to allow async/await usage at the top level, ; is used to prevent issues with certain linters
 // import mongoose from "mongoose";
@@ -31,3 +20,25 @@ connectDB();
 //     console.error("Failed to connect to MongoDB", err);
 //   }
 // })();
+
+// This is the second approach to connect to MongoDB and start the Express server.
+
+import { app } from "./app.js";
+import connectDB from "./db/index.js";
+import dotenv from "dotenv";
+
+dotenv.config(); // Load environment variables from .env file
+
+connectDB()
+  .then(() => {
+    app.on("error", (err) => {
+      console.log("Express app error:", err);
+      throw err;
+    });
+    app.listen(process.env.PORT, () => {
+      console.log("Server is running on PORT: ", process.env.PORT);
+    });
+  })
+  .catch((err) => {
+    console.log("Error connecting to DB", err);
+  });
